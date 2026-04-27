@@ -1,62 +1,79 @@
-# 코젠바이오텍 실험데이터 통합
+# experiment-data-merge
 
-장비별로 서로 다른 형식의 실험 결과 파일을 하나의 표준 엑셀 파일로 통합하는 Codex 기반 실습/운영 저장소입니다.
+Codex에서 사용하는 실험데이터 통합 스킬 저장소입니다. 이 저장소는 학습자 혼동을 줄이기 위해 스킬 본체만 포함합니다.
 
-## Codex 사용 원칙
+## 팀 사용 원칙
 
-우리 팀은 모두 Codex를 사용하는 것을 기본 규칙으로 합니다. 따라서 파일을 메신저로 전달하지 말고, Codex에서 GitHub 클론 링크를 가져와 저장소를 연결해 사용하는 방식으로 안내하면 됩니다.
+우리 팀은 모두 Codex를 사용합니다. 따라서 파일을 따로 전달하지 말고, Codex에서 이 저장소의 클론 링크를 가져와 연결해서 사용하도록 안내하면 됩니다.
+
+저장소 링크:
+
+[https://github.com/jch2100/kogen_data_merge](https://github.com/jch2100/kogen_data_merge)
 
 직원 안내 문구 예시:
 
 ```text
-Codex에서 아래 GitHub 저장소의 클론 링크를 가져와 연결한 뒤 사용하세요.
-https://github.com/jch2100/kogen_data_merge
+Codex에서 experiment-data-merge 저장소의 클론 링크를 가져와 연결한 뒤 사용하세요.
+연결 후 README를 보고 바로 실행하면 됩니다.
 ```
 
-## 이 저장소에 들어있는 것
+## 저장소 구성
 
-- `samples/`: 입력 예시 파일
-- `outputs/`: 통합 결과 예시 파일
-- `skill/experiment-data-merge/`: Codex 스킬 패키지
-- `merge_experiment_results.mjs`: 실습용 병합 스크립트
-- `run_latest_experiment_merge.ps1`: 최신 파일 병합 실행 스크립트
-- `04_*.md` ~ `07_*.md`: 실습/강의 문서
+이 저장소에는 스킬에 필요한 파일만 있습니다.
 
-## 직원이 Codex에서 사용하는 방법
+```text
+.
+├─ SKILL.md
+├─ README.md
+└─ scripts/
+   ├─ merge_experiment_results.mjs
+   └─ run_merge.ps1
+```
 
-1. Codex에서 저장소 클론 링크를 사용해 이 저장소를 가져옵니다.
-2. 필요하면 `skill/experiment-data-merge/README.md`를 먼저 읽습니다.
-3. Codex에 아래처럼 요청합니다.
+## Codex에서 사용하는 방법
+
+Codex에 아래처럼 요청하면 됩니다.
 
 ```text
 experiment-data-merge 스킬을 사용해서
-samples 폴더의 파일들을 하나로 통합해줘.
-결과는 outputs 폴더에 저장해줘.
+C:\data\samples 폴더의 실험 파일을 하나로 통합해줘.
+결과는 C:\data\outputs 폴더에 저장해줘.
 ```
 
-## 스킬 위치
+조금 더 구체적으로 요청하려면:
 
-주요 스킬 문서는 아래 경로에 있습니다.
-
-- `skill/experiment-data-merge/SKILL.md`
-- `skill/experiment-data-merge/README.md`
-- `skill/experiment-data-merge/scripts/merge_experiment_results.mjs`
-- `skill/experiment-data-merge/scripts/run_merge.ps1`
+```text
+experiment-data-merge 스킬로 최신 3개 파일만 읽어서 통합해줘.
+매핑 실패가 있으면 검토필요 시트에 남겨줘.
+```
 
 ## 직접 실행하는 방법
 
 PowerShell에서 아래처럼 실행할 수 있습니다.
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\skill\experiment-data-merge\scripts\run_merge.ps1 `
-  -InputDir ".\samples" `
-  -OutputDir ".\outputs" `
+powershell -ExecutionPolicy Bypass -File .\scripts\run_merge.ps1 `
+  -InputDir "C:\data\samples" `
+  -OutputDir "C:\data\outputs" `
   -Latest 3
 ```
 
-## 출력 결과
+옵션:
 
-생성되는 통합 워크북에는 아래 시트가 포함됩니다.
+- `InputDir`: 입력 파일 폴더
+- `OutputDir`: 결과 파일 저장 폴더
+- `Latest`: 최신 파일 몇 개를 읽을지
+- `TodayOnly`: 오늘 수정된 파일만 대상으로 제한할지 여부
+
+## 스킬이 하는 일
+
+- 장비별로 다른 CSV/XLSX 컬럼을 감지합니다.
+- 공통 스키마로 정규화합니다.
+- 하나의 Excel 결과 파일로 저장합니다.
+- 장비별 추가 항목과 매핑 로그를 함께 남깁니다.
+- 누락 필드나 매핑 실패를 검토용 시트에 기록합니다.
+
+## 생성되는 워크북 시트
 
 - `README`
 - `통합본`
@@ -64,3 +81,13 @@ powershell -ExecutionPolicy Bypass -File .\skill\experiment-data-merge\scripts\r
 - `장비요약`
 - `매핑로그`
 - `검토필요`
+
+## 새 장비 포맷 추가 방법
+
+새 장비가 들어오면 `scripts/merge_experiment_results.mjs`의 `deviceDefinitions` 객체에 매핑만 추가하면 됩니다.
+
+확인할 항목:
+
+1. 장비 식별 키
+2. 시트 이름 필요 여부
+3. 원본 컬럼명과 표준 컬럼명의 대응
