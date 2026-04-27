@@ -1,0 +1,5 @@
+Sample No,Measured At,User,Equipment,Result,Signal,QC Score,Ambient Temp (C),Operator Note
+S-001,2026-04-17,Kim MJ,Analyzer-A,12.41,98.2,0.97,24.1,stable
+S-002,2026-04-17,Kim MJ,Analyzer-A,11.93,101.4,0.95,24,recheck recommended
+S-003,2026-04-17,Lee SH,Analyzer-A,12.88,96.7,0.92,24.3,stable
+S-004,2026-04-18,Lee SH,Analyzer-A,13.02,102.1,0.98,23.9,stable
